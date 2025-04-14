@@ -16,12 +16,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const weeklyForecastEl = document.querySelector(".weekly-forecast");
   const windChartCanvas = document.getElementById("windChart");
   const uvChartCanvas = document.getElementById("uvChart");
-  
+  const uvsubtext = document.querySelector(".uv-subtext")
+  const visibilityvalue =document.querySelector(".visibility-value")
+
 
   let windChart; // To store the chart instance for updates
   let tempChart; // Add this near the top with windChart
   let uvChart; // Add this for UV chart instance
-  
+
   updateWeatherData("Uttarakhand");
   searchBtn.addEventListener("click", function () {
     const city = searchInput.value.trim();
@@ -77,11 +79,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const dailyData = {};
     const today = new Date().toDateString();
 
+    // Process forecast data to group by day
     forecastData.list.forEach(item => {
       const date = new Date(item.dt * 1000);
       const dayKey = date.toDateString();
+      const hour = date.getHours();
 
-      if (!dailyData[dayKey] && dayKey !== today) {
+      // Prefer midday data (12 PM to 3 PM) for a better daily summary
+      if (!dailyData[dayKey] || (hour >= 12 && hour <= 15)) {
         dailyData[dayKey] = {
           temp: item.main.temp,
           weatherId: item.weather[0].id,
@@ -90,9 +95,14 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+    // Clear existing forecast
     weeklyForecastEl.innerHTML = '';
 
-    Object.values(dailyData).slice(0, 7).forEach(day => {
+    // Get up to 6 days (including today)
+    const forecastDays = Object.values(dailyData).slice(0, 6);
+
+    // Render each day
+    forecastDays.forEach(day => {
       const dayCard = document.createElement('div');
       dayCard.className = 'day-card';
       dayCard.innerHTML = `
@@ -102,6 +112,11 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
       weeklyForecastEl.appendChild(dayCard);
     });
+
+    // Log if fewer than 6 days are available
+    if (forecastDays.length < 6) {
+      console.warn(`Only ${forecastDays.length} days of forecast data available.`);
+    }
   }
 
   function initializeWindChart(labels, data) {
@@ -111,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
       data: {
         labels: labels.slice(0, 20),
         datasets: [{
-          label: 'Wind Speed (km/h)',
+          label: 'Wind Speed(km/h)',
           data: data.slice(0, 20),
           backgroundColor: 'rgba(224, 204, 47, 0.72)', // Gold color similar to image
           barPercentage: 0.4,
@@ -131,8 +146,8 @@ document.addEventListener("DOMContentLoaded", function () {
           },
 
           y: {
-            title: { display: true, text: 'Wind Speed (km/h)' },
-            beginAtZero: true,
+            title: { display: true, text: 'Wind Speed (km/hr)    ' },
+            
             ticks: { display: false },
             grid: { display: false }
 
@@ -144,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         },
         layout: {
-          padding: { left: 10, right: 10, top: 10, bottom: 10 } // Add padding for styling
+          padding: { left: 10, right: 10, top: 10 } // Add padding for styling
         }
       }
     });
@@ -198,7 +213,78 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  
+  // Helper function to draw ring arcs
+  function drawRingArc(ctx, centerX, centerY, innerRadius, outerRadius, startAngle, endAngle, fillStyle) {
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+    ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+    ctx.closePath();
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+  }
+
+  function initializeUVChart(uvValue) {
+    if (uvChart) uvChart.destroy();
+
+    // Ensure uvValue is a valid number, default to 0 if undefined or invalid
+    uvValue = (typeof uvValue === 'number' && !isNaN(uvValue)) ? Math.min(Math.max(uvValue, 0), 12) : 0;
+
+    uvChart = new Chart(uvChartCanvas, {
+        type: 'doughnut',
+        data: { labels: [], datasets: [] },
+        options: {
+            cutout: '90%',
+            circumference: Math.PI,
+            rotation: -Math.PI / 2,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } },
+            animation: { animateRotate: true, duration: 1000 },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    updateWeatherData(document.querySelector(".location-name").textContent);
+                }
+            },
+            maintainAspectRatio: true
+        },
+        plugins: [{
+            id: 'uvGaugeCustomization',
+            beforeDraw(chart) {
+                const { ctx } = chart;
+                const { width, height } = chart.chartArea;
+                const centerX = width / 2;
+                const centerY = height / 1.5;
+                const R = Math.min(width, height) / 2.8;
+                const uvDisplayValue = (typeof chart.uvValue === 'number' && !isNaN(chart.uvValue)) ? chart.uvValue : 0;
+
+                // Outer track (solid color instead of gradient)
+                drawRingArc(ctx, centerX, centerY, R * 0.9, R, Math.PI, 2 * Math.PI, '#696969');
+
+                // Inner accent bar (solid color instead of gradient)
+                const f = uvDisplayValue / 12;
+                const innerEndA = Math.PI + f * Math.PI;
+                drawRingArc(ctx, centerX, centerY, R * 0.7, R * 0.8, Math.PI, innerEndA, 'rgba(224, 204, 47, 0.72)');
+
+                // Draw labels
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '12px Arial';
+                ctx.fillStyle = '#FFFFFF';
+                const labelRadius = R * 1.05;
+                [0, 2, 4, 6, 8, 10, 12].forEach(V => {
+                    const angle = Math.PI + (V / 12) * Math.PI;
+                    const labelX = centerX + Math.cos(angle) * labelRadius;
+                    const labelY = centerY + Math.sin(angle) * labelRadius;
+                    ctx.fillText(V.toString(), labelX, labelY);
+                });
+                ctx.restore();
+            }
+        }]
+    });
+
+    // Assign uvValue to chart instance
+    uvChart.uvValue = uvValue;
+}
 
   // Function to calculate dew point
   function calculateDewPoint(temp, humidity) {
@@ -219,7 +305,8 @@ document.addEventListener("DOMContentLoaded", function () {
         weather: [{ id, main }],
         wind: { speed },
         sys: { sunrise, sunset },
-        coord: { lat, lon }
+        coord: { lat, lon },
+        visibility: visibility
       } = weatherData;
 
       // Update current weather display
@@ -227,9 +314,11 @@ document.addEventListener("DOMContentLoaded", function () {
       tempvalue.textContent = Math.round(temp) + '° C';
       conditiontxt.textContent = main;
       weathericon.src = `/assets/${getWeatherIcon(id)}`;
-      windspeed.textContent = speed + ' km/h';
+      windspeed.textContent = speed + 'km/h';
       Humidityvalue.textContent = humidity + '%';
+      visibilityvalue.textContent = visibility / 1000 + 'km';
 
+      
       // Calculate and display dew point
       const dewPoint = calculateDewPoint(temp, humidity);
       const dewPointElement = document.querySelector(".humidity small");
@@ -240,9 +329,35 @@ document.addEventListener("DOMContentLoaded", function () {
       riseEl.textContent = `Sunrise: ${toLocal(sunrise)}`;
       setEl.textContent = `Sunset: ${toLocal(sunset)}`;
 
-      // Fetch UV Index using coordinates
       const uvData = await getFetchData('uvi', { lat, lon });
       uvText.textContent = `${uvData.value} UV`;
+      initializeUVChart(uvData.value); // Initialize UV chart with live data
+      if (uvData.value < 3) {
+        uvsubtext.textContent = "Low"
+      }else if (uvData.value > 3 && uvData.value < 6 ) {
+        uvsubtext.textContent = "Moderate"
+      }
+      else if (uvData.value >=6 && uvData.value < 8 ) {
+        uvsubtext.textContent = "High"
+      }
+      else if (uvData.value >=8 && uvData.value < 11 ) {
+        uvsubtext.textContent = "Very high"
+      }
+      else if (uvData.value >= 11 ) {
+        uvsubtext.textContent = "Extreme"
+      }
+
+      // Calculate and display feels like (temp + dew point)
+      const feelsLike = Math.round(temp + dewPoint);
+      const feels = document.querySelector(".feel");
+      feels.textContent = `${feelsLike}°`;
+      const feelsLikeSmall = document.querySelector(".feels-like small");
+    if (feelsLikeSmall) {
+      feelsLikeSmall.textContent = feelsLike > temp ? "Humidity is making it feel hotter" : "Humidity is making it feel cooler";
+    } else {
+      console.log("Feels Like small element not found");
+    }
+
 
       // Fetch and render weekly forecast
       const forecastData = await getFetchData('forecast', city);
@@ -278,7 +393,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Initialize the temperature chart
       initializeTempChart(tempLabels, temperatures);
-      
+
 
     } catch (error) {
       console.error('Error updating weather:', error);
