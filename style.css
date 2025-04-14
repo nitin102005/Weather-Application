@@ -245,9 +245,10 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     padding: 1rem;
-    height: fit-content;
     max-height: calc(100vh - 400px);
     overflow-y: auto;
+    height: 353px !important;
+    width: 852px !important;
   }
   
   .card {
