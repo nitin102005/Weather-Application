@@ -1,0 +1,325 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #333;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  height: 95vh;
+  width: 80vw;
+  background-color: #121212;
+  position: relative;
+  left: 160px;
+  top: 20px;
+  border-radius: 20px;
+}
+
+.sidebar {
+  width: 25%;
+  background-color: #121212;
+  padding: 2rem;
+  display: flex;
+  gap: 18px;
+  flex-direction: column;
+  border-right: 1px solid #333;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+
+}
+
+.logo {
+  height: 14vh;
+  position: relative;
+  top: 14px;
+  padding: 10px;
+  left: 30px;
+  display: flex;
+  justify-content: center;
+  opacity: 0.8;
+
+
+}
+
+canvas {
+  width: 210px;
+  height: 150px;
+
+
+}
+
+.sidebar-details {
+  position: relative;
+  top: -49px;
+}
+
+.location-details {
+  display: flex;
+  align-items: center;
+  /* vertically center image and text */
+  gap: 2px;
+  /* more breathing space between image and text */
+  position: relative;
+  left: -10px;
+  /* reduced shift for better balance */
+  color: #ffffff;
+  /* ensure the text is visible on dark background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.location-details img {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  /* in case the icon doesn't look white */
+}
+
+.location-details p {
+  margin: 0;
+  /* remove default margin */
+  font-size: 14px;
+}
+
+.dashboard {
+  width: 75%;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.location h2 {
+  font-size: 1.5rem;
+}
+
+/* #search-btn{
+    width: 10px;
+    height: 10px;
+  } */
+#search-icon {
+  height: 17px;
+  opacity: 0.7;
+}
+
+#search-icon:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.search-bar {
+  width: 90%;
+  background: #2b2b2bf1;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  padding: 10px 10px;
+  height: 27px;
+  position: relative;
+  left: 15px;
+  top: 5px;
+}
+
+.search-bar input {
+  background: transparent;
+  border: 0;
+  outline: none;
+  flex: 1;
+  padding: 3px;
+  font-size: 10px;
+  color: #e5e4f0c0;
+
+}
+
+.search-bar button {
+  cursor: pointer;
+  padding-top: 1px;
+}
+
+.location p {
+  color: #aaa;
+}
+
+.current-weather {
+  text-align: center;
+  padding: 8px;
+  padding-top: 2px;
+  padding-bottom: 16px;
+}
+
+.current-weather h1 {
+  font-size: 3rem;
+}
+
+.weather-icon i {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.temperature-graph {
+  background-color: #2b2b2b;
+  padding: 0.7rem;
+  border-radius: 1rem;
+  text-align: center;
+  font-size: 15px;
+  position: relative;
+  right: 16px;
+  width: 18vw;
+
+}
+
+.temperature-graph canvas {
+  margin-top: 1rem;
+  max-width: 100%;
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.promo-box {
+  background-color: #2b2b2b;
+  padding: 1rem;
+  border-radius: 1rem;
+  text-align: center;
+  position: relative;
+  top: 10px;
+}
+
+.promo-box img {
+  width: 100%;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.promo-box button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+
+
+.weekly-forecast {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.day-card {
+  background-color: #2b2b2b;
+  padding: 1rem;
+  border-radius: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  height: 135px;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: #2b2b2b;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card small {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.wind-speed {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.uv-index {
+  text-align: center;
+}
+
+.overview h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+}
+
+.sunrise {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  /* Vertically align image and text */
+  gap: 10px;
+}
+
+.sunrise img {
+  height: 55px;
+}
+
+.sunset {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  /* Vertically align image and text */
+  gap: 15px;
+}
+
+.sunset img {
+  height: 46px;
+  margin-left: 4px;
+}
+
+.weeklyweather {
+  height: 50px;
+}
+
+#windChart {
+  position: relative;
+  top: 25px;
+  left: -8px;
+}
+#tempChart{
+  position: relative;
+  right: 2px;
+  top: 3px;
+}
+
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .dashboard {
+    width: 100%;
+  }
+}

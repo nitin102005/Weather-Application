@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+  <main class="container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-details">
+      <div class="location">
+        <img class="logo" src="logo.png" alt="logo">
+        <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Enter city name..." />
+        <button id="search-btn" type="submit" style="background: none; border: none;">
+            <img id="search-icon" src="https://img.icons8.com/ios-filled/48/ffffff/search--v1.png" alt="Search Icon">
+          </button>
+        </div>
+      </div>
+
+      <div class="current-weather">
+        <div class="weather-icon">
+          <img class="weather" src="/assets/02n.png" alt="">
+        </div>
+        <h2 class="temperature">14° C</h2>
+        <p class="condition-text">Dramatic cloudy</p>
+      </div>
+
+      <div class="temperature-graph">
+        <h3 style="font-family:  'Poppins', sans-serif;
+    font-weight: 500;" >Temperature</h3>
+        <canvas id="tempChart"></canvas>
+        <div class="labels">
+          
+        </div>
+      </div>
+
+      <div class="promo-box">
+        <!-- <img src="assets/city.jpg" alt="City View" /> -->
+        <p>Explore global map of wind, weather, and ocean condition.</p>
+        <button>Get Started</button>
+      </div>
+    </div>
+    </aside>
+    
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+      <div class="top-bar">
+        <div class="date">
+          <h2 id="current-date"></h2>
+          <p id="current-day"></p>
+        </div>
+        <div class="location-details">
+            <img src="https://img.icons8.com/?size=100&id=7880&format=png&color=FFFFFF" alt="location">
+            <p class="location-name">Uttarakhand</p>
+        </div>
+        
+      </div>
+
+      <div class="weekly-forecast">
+        <div class="day-card"><p>Sun</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>16°</p></div>
+        <div class="day-card"><p>Mon</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>14°</p></div>
+        <div class="day-card"><p>Tue</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>15°</p></div>
+        <div class="day-card"><p>Wed</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>13°</p></div>
+        <div class="day-card"><p>Thu</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>17°</p></div>
+        <div class="day-card"><p>Fri</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>12°</p></div>
+        <div class="day-card"><p>Sat</p><img class="weeklyweather" src="/assets/02n.png" alt=""><p>11°</p></div>
+      </div>
+
+      <div class="overview" >
+
+        <div class="card wind-status">
+          <h3>Wind Status</h3>
+          <canvas id="windChart"></canvas>
+          <p class="wind-speed">7.50 km/h</p>
+        </div>
+
+        <div class="card uv-index">
+          <h3>UV Index</h3>
+          <canvas id="uvChart"></canvas>
+          <p class="uv-value">5.50 uv</p>
+        </div>
+        
+        <div class="card sunrise-sunset"><h3>Sunrise and Sunset</h3>
+          <div class="sunrise">
+            <img src="assets/sunrise.png" alt="">
+            <p id="sunrise-time"> Sunrise : 6:32 AM</p>
+          </div>
+          <div class="sunset">
+            <img src="assets/sunset.png" alt="">
+            <p id="sunset-time"> Sunset : 5:42 PM</p>
+          </div>
+        </div>
+
+        <div class="card humidity">
+          <h3>Humidity</h3>
+          <p class="Humidity">84%</p>
+          <small>The dew point is 27° right now</small>
+        </div>
+
+        <div class="card visibility">
+          <h3>Visibility</h3>
+          <p>04km</p>
+          <small>Haze is affecting visibility</small>
+        </div>
+
+        <div class="card feels-like">
+          <h3>Feels like</h3>
+          <p>42°</p>
+          <small>Humidity is making it feel hotter</small>
+        </div>
+
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
