@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (endpoint === 'forecast') {
       URL = `https://api.openweathermap.org/data/2.5/forecast?q=${params}&units=metric&appid=${apiKey}`;
     } else if (endpoint === 'uvi') {
-      URL = `http://api.openweathermap.org/data/2.5/uvi?lat=${params.lat}&lon=${params.lon}&appid=${apiKey}`;
+      URL = `https://api.openweathermap.org/data/2.5/uvi?lat=${params.lat}&lon=${params.lon}&appid=${apiKey}`;
     }
     const response = await fetch(URL);
     if (!response.ok) throw new Error(`Failed to fetch ${endpoint} data`);
