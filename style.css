@@ -194,6 +194,10 @@
     position: relative;
     top: 10px;
   }
+.feels-like, .visibility .humidity{
+  height: 107px !important;
+  width: 268px !important;
+}
   
   .promo-box img {
     width: 100%;
