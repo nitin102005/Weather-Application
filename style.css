@@ -20,7 +20,21 @@ body {
   left: 160px;
   top: 20px;
   border-radius: 20px;
+  height: 95vh;
+  width: 80vw;
+  display: flex;
 }
+
+/* .Not-found{
+  position: relative;
+  left: 160px;
+  top: 20px;
+  border-radius: 20px;
+  position: relative;
+  z-index: 2;
+  height: 95vh;
+  width: 80vw;
+} */
 
 .sidebar {
   width: 25%;
@@ -47,7 +61,9 @@ body {
 
 
 }
-.feels-like, .visibility .humidity{
+
+.feels-like,
+.visibility .humidity {
   height: 107px !important;
   width: 268px !important;
 }
@@ -331,14 +347,203 @@ body {
 .sunrise-sunset,
 .uv-index,
 .wind-status {
-  height: 30vh;
+  max-height: 30vh;
 
 }
-.uv-subtext{
+
+.uv-subtext {
   position: relative;
-    bottom: 68px;
+  bottom: 68px;
+  text-align: center;
+  left: 100px;
+}
+
+/* Existing media query */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .dashboard {
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+/* Additional media queries for full responsiveness */
+
+/* Adjust container positioning for larger tablets */
+@media (max-width: 1024px) {
+  .container {
+    left: 50px;
+    top: 10px;
+    width: 90vw;
+    height: 90vh;
+  }
+}
+
+/* Adjust container for small mobile devices */
+@media (max-width: 480px) {
+  .container {
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: auto;
+  }
+}
+
+/* Adjust sidebar and dashboard padding for smaller screens */
+@media (max-width: 600px) {
+  .sidebar {
+    padding: 1rem;
+  }
+
+  .dashboard {
+    padding: 1rem;
+  }
+}
+
+/* Make fixed-width/height elements responsive */
+@media (max-width: 768px) {
+
+  .feels-like,
+  .visibility,
+  .humidity {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .logo {
+    left: 90px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 3px;
+  }
+
+  .temperature-graph {
+    width: 92vw;
+    right: 0;
+    margin-bottom: 12px;
+  }
+
+  .dashboard {
+    bottom: 42px;
+    position: relative;
+  }
+
+  #windChart {
+    top: -1px;
+  }
+
+  .wind-status {
+    width: 92vw;
+    max-height: 35vh;
+    
+  }
+
+  .wind-speed {
+    position: relative;
+    bottom: 20px;
+    font-size: 13px;
+
+  }
+
+  .top-bar {
+    margin-bottom: 1rem;
+    padding: 9px;
+    margin-top: -14px;
+  }
+
+  .overview {
+    width: 100% !important;
+    height: auto !important;
+    grid-template-columns: 1fr;
+    /* Stack cards vertically */
+  }
+
+  .uv-value {
     text-align: center;
-    left: 100px;
+    position: relative;
+    left: 0px;
+    bottom: 68px;
+    font-size: 13px;
+  }
+
+  .uv-subtext {
+    left: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    text-align: center;
+    position: relative;
+  }
+
+  .uv-index {
+    max-height: 33vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+  }
+
+
+  #tempChart {
+    width: 100% !important;
+    left: 3px;
+    top: 5px;
+    margin: -0.5rem;
+    padding: 20px;
+  }
+
+  #uvChart {
+    width: 98% !important;
+    margin-top: -1px;
+    left: 5px;
+  }
+}
+
+/* Scale text and icons for very small screens */
+@media (max-width: 480px) {
+  .current-weather h1 {
+    font-size: 2rem;
+  }
+
+  .weather-icon i {
+    font-size: 2rem;
+  }
+
+  .location-details p {
+    font-size: 16px;
+  }
+
+  .sunrise img,
+  .sunset img {
+    height: 40px;
+  }
+
+  .promo-box img {
+    width: 100%;
+    height: auto;
+  }
+
+  .promo-box button {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Adjust grid layouts for smaller screens */
+@media (max-width: 600px) {
+  .weekly-forecast {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .day-card {
+    padding: 0.5rem;
+    height: auto;
+  }
 }
 
 @media (max-width: 768px) {
