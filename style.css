@@ -435,16 +435,21 @@ body {
   #windChart {
     top: -1px;
   }
+  .sunset{
+    margin-left: -4px;
+  }
 
   .wind-status {
     width: 92vw;
-    max-height: 35vh;
+    height: auto !important;
+    max-height: none;
+    padding: 10px 10px;
     
   }
 
   .wind-speed {
     position: relative;
-    bottom: 20px;
+    bottom: 10px;
     font-size: 13px;
 
   }
