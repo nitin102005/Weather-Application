@@ -24,9 +24,12 @@ document.addEventListener("DOMContentLoaded", function () {
   let tempChart; // Add this near the top with windChart
   let uvChart; // Add this for UV chart instance
 
-  updateWeatherData("Uttarakhand");
+  updateWeatherData("Uttarakhand"); //Default city 
+
+
+
   searchBtn.addEventListener("click", function () {
-    const city = searchInput.value.trim();
+    const city = searchInput.value.trim();  //Remove spaces on search input
     if (city === "") {
       alert("Please enter a city name.");
       return;
@@ -36,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   searchInput.addEventListener("keypress", function (event) {
-    if (event.key === "Enter") {
+    if (event.key === "Enter") {    
       searchBtn.click();
     }
   });
@@ -48,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (endpoint === 'forecast') {
       URL = `https://api.openweathermap.org/data/2.5/forecast?q=${params}&units=metric&appid=${apiKey}`;
     } else if (endpoint === 'uvi') {
-      URL = `https://api.openweathermap.org/data/2.5/uvi?lat=${params.lat}&lon=${params.lon}&appid=${apiKey}`;
+      URL = `https://api.openweathermap.org/data/2.5/uvi?lat=${params.lat}&lon=${params.lon}&appid=${apiKey}`;    //Getting UV value
     }
     const response = await fetch(URL);
     if (!response.ok) throw new Error(`Failed to fetch ${endpoint} data`);
@@ -76,48 +79,38 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderWeeklyForecast(forecastData) {
-    const dailyData = {};
-    const today = new Date().toDateString();
-
-    // Process forecast data to group by day
+    const forecastByDay = {};
+  
     forecastData.list.forEach(item => {
       const date = new Date(item.dt * 1000);
-      const dayKey = date.toDateString();
+      const dayStr = date.toDateString();
       const hour = date.getHours();
-
-      // Prefer midday data (12 PM to 3 PM) for a better daily summary
-      if (!dailyData[dayKey] || (hour >= 12 && hour <= 15)) {
-        dailyData[dayKey] = {
-          temp: item.main.temp,
-          weatherId: item.weather[0].id,
-          dayName: date.toLocaleDateString(undefined, { weekday: 'short' })
+  
+      // Pick one entry per day, ideally between 12–3 PM
+      if (!forecastByDay[dayStr] || (hour >= 12 && hour <= 15)) {
+        forecastByDay[dayStr] = {
+          day: date.toLocaleDateString(undefined, { weekday: 'short' }),
+          temp: Math.round(item.main.temp),
+          icon: getWeatherIcon(item.weather[0].id)
         };
       }
     });
-
-    // Clear existing forecast
+  
+    // Clear previous forecast
     weeklyForecastEl.innerHTML = '';
-
-    // Get up to 6 days (including today)
-    const forecastDays = Object.values(dailyData).slice(0, 6);
-
-    // Render each day
-    forecastDays.forEach(day => {
-      const dayCard = document.createElement('div');
-      dayCard.className = 'day-card';
-      dayCard.innerHTML = `
-        <p>${day.dayName}</p>
-        <img class="weeklyweather" src="/assets/${getWeatherIcon(day.weatherId)}" alt="weather icon">
-        <p>${Math.round(day.temp)}°</p>
+  
+    // Show max 6 days
+    Object.values(forecastByDay).slice(0, 6).forEach(day => {
+      weeklyForecastEl.innerHTML += `
+        <div class="day-card">
+          <p>${day.day}</p>
+          <img class="weeklyweather" src="/assets/${day.icon}" alt="weather icon">
+          <p>${day.temp}°</p>
+        </div>
       `;
-      weeklyForecastEl.appendChild(dayCard);
     });
-
-    // Log if fewer than 6 days are available
-    if (forecastDays.length < 6) {
-      console.warn(`Only ${forecastDays.length} days of forecast data available.`);
-    }
   }
+  
 
   function initializeWindChart(labels, data) {
     if (windChart) windChart.destroy(); // Destroy existing chart if it exists
@@ -293,6 +286,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const gamma = ((a * temp) / (b + temp)) + Math.log(humidity / 100);
     const dewPoint = (b * gamma) / (a - gamma);
     return Math.round(dewPoint);
+  }
+
+  function showNotFound() {
+    dashboard.innerHTML = ''; // Clear dashboard content
+    notFoundSection.style.display = 'block'; // Show Lottie animation
   }
 
   async function updateWeatherData(city) {
