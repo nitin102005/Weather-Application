@@ -295,104 +295,113 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function updateWeatherData(city) {
     try {
-      // Fetch current weather
-      const weatherData = await getFetchData('weather', city);
-      const {
-        name: country,
-        main: { temp, humidity },
-        weather: [{ id, main }],
-        wind: { speed },
-        sys: { sunrise, sunset },
-        coord: { lat, lon },
-        visibility: visibility
-      } = weatherData;
+        // Remove the loaded class first
+        const dashboard = document.querySelector('.dashboard');
+        dashboard.classList.remove('loaded');
+        
+        // Fetch current weather
+        const weatherData = await getFetchData('weather', city);
+        const {
+          name: country,
+          main: { temp, humidity },
+          weather: [{ id, main }],
+          wind: { speed },
+          sys: { sunrise, sunset },
+          coord: { lat, lon },
+          visibility: visibility
+        } = weatherData;
 
-      // Update current weather display
-      loc.textContent = country;
-      tempvalue.textContent = Math.round(temp) + '° C';
-      conditiontxt.textContent = main;
-      weathericon.src = `/assets/${getWeatherIcon(id)}`;
-      windspeed.textContent = speed + 'km/h';
-      Humidityvalue.textContent = humidity + '%';
-      visibilityvalue.textContent = visibility / 1000 + 'km';
+        // Update current weather display
+        loc.textContent = country;
+        tempvalue.textContent = Math.round(temp) + '° C';
+        conditiontxt.textContent = main;
+        weathericon.src = `/assets/${getWeatherIcon(id)}`;
+        windspeed.textContent = speed + 'km/h';
+        Humidityvalue.textContent = humidity + '%';
+        visibilityvalue.textContent = visibility / 1000 + 'km';
 
-      
-      // Calculate and display dew point
-      const dewPoint = calculateDewPoint(temp, humidity);
-      const dewPointElement = document.querySelector(".humidity small");
-      dewPointElement.textContent = `The dew point is ${dewPoint}° right now`;
+        
+        // Calculate and display dew point
+        const dewPoint = calculateDewPoint(temp, humidity);
+        const dewPointElement = document.querySelector(".humidity small");
+        dewPointElement.textContent = `The dew point is ${dewPoint}° right now`;
 
-      const toLocal = ts => new Date(ts * 1000)
-        .toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-      riseEl.textContent = `Sunrise: ${toLocal(sunrise)}`;
-      setEl.textContent = `Sunset: ${toLocal(sunset)}`;
+        const toLocal = ts => new Date(ts * 1000)
+          .toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        riseEl.textContent = `Sunrise: ${toLocal(sunrise)}`;
+        setEl.textContent = `Sunset: ${toLocal(sunset)}`;
 
-      const uvData = await getFetchData('uvi', { lat, lon });
-      uvText.textContent = `${uvData.value} UV`;
-      initializeUVChart(uvData.value); // Initialize UV chart with live data
-      if (uvData.value < 3) {
-        uvsubtext.textContent = "Low"
-      }else if (uvData.value > 3 && uvData.value < 6 ) {
-        uvsubtext.textContent = "Moderate"
+        const uvData = await getFetchData('uvi', { lat, lon });
+        uvText.textContent = `${uvData.value} UV`;
+        initializeUVChart(uvData.value); // Initialize UV chart with live data
+        if (uvData.value < 3) {
+          uvsubtext.textContent = "Low"
+        }else if (uvData.value > 3 && uvData.value < 6 ) {
+          uvsubtext.textContent = "Moderate"
+        }
+        else if (uvData.value >=6 && uvData.value < 8 ) {
+          uvsubtext.textContent = "High"
+        }
+        else if (uvData.value >=8 && uvData.value < 11 ) {
+          uvsubtext.textContent = "Very high"
+        }
+        else if (uvData.value >= 11 ) {
+          uvsubtext.textContent = "Extreme"
+        }
+
+        // Calculate and display feels like (temp + dew point)
+        const feelsLike = Math.round(temp + dewPoint);
+        const feels = document.querySelector(".feel");
+        feels.textContent = `${feelsLike}°`;
+        const feelsLikeSmall = document.querySelector(".feels-like small");
+      if (feelsLikeSmall) {
+        feelsLikeSmall.textContent = feelsLike > temp ? "Humidity is making it feel hotter" : "Humidity is making it feel cooler";
+      } else {
+        console.log("Feels Like small element not found");
       }
-      else if (uvData.value >=6 && uvData.value < 8 ) {
-        uvsubtext.textContent = "High"
-      }
-      else if (uvData.value >=8 && uvData.value < 11 ) {
-        uvsubtext.textContent = "Very high"
-      }
-      else if (uvData.value >= 11 ) {
-        uvsubtext.textContent = "Extreme"
-      }
-
-      // Calculate and display feels like (temp + dew point)
-      const feelsLike = Math.round(temp + dewPoint);
-      const feels = document.querySelector(".feel");
-      feels.textContent = `${feelsLike}°`;
-      const feelsLikeSmall = document.querySelector(".feels-like small");
-    if (feelsLikeSmall) {
-      feelsLikeSmall.textContent = feelsLike > temp ? "Humidity is making it feel hotter" : "Humidity is making it feel cooler";
-    } else {
-      console.log("Feels Like small element not found");
-    }
 
 
-      // Fetch and render weekly forecast
-      const forecastData = await getFetchData('forecast', city);
-      renderWeeklyForecast(forecastData);
+        // Fetch and render weekly forecast
+        const forecastData = await getFetchData('forecast', city);
+        renderWeeklyForecast(forecastData);
 
-      // Process wind data for chart
-      const windData = forecastData.list.map(item => ({
-        speed: item.wind.speed,
-        time: new Date(item.dt * 1000).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
-      }));
-      const labels = windData.map(d => d.time);
-      const speeds = windData.map(d => Math.round(d.speed * 3.6)); // Convert m/s to km/h
-      initializeWindChart(labels.slice(0, 40), speeds.slice(0, 40)); // Limit to 40 data points for clarity
+        // Process wind data for chart
+        const windData = forecastData.list.map(item => ({
+          speed: item.wind.speed,
+          time: new Date(item.dt * 1000).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+        }));
+        const labels = windData.map(d => d.time);
+        const speeds = windData.map(d => Math.round(d.speed * 3.6)); // Convert m/s to km/h
+        initializeWindChart(labels.slice(0, 40), speeds.slice(0, 40)); // Limit to 40 data points for clarity
 
-      // Process temperature data for chart (average per time period)
-      const tempData = forecastData.list.slice(0, 8).reduce((acc, item) => {
-        const hour = new Date(item.dt * 1000).getHours();
-        const temp = item.main.temp;
-        if (hour >= 6 && hour < 12) acc.morning.push(temp); // Morning: 6 AM - 12 PM
-        else if (hour >= 12 && hour < 18) acc.afternoon.push(temp); // Afternoon: 12 PM - 6 PM
-        else if (hour >= 18 && hour < 24) acc.evening.push(temp); // Evening: 6 PM - 12 AM
-        else acc.night.push(temp); // Night: 12 AM - 6 AM
-        return acc;
-      }, { morning: [], afternoon: [], evening: [], night: [] });
+        // Process temperature data for chart (average per time period)
+        const tempData = forecastData.list.slice(0, 8).reduce((acc, item) => {
+          const hour = new Date(item.dt * 1000).getHours();
+          const temp = item.main.temp;
+          if (hour >= 6 && hour < 12) acc.morning.push(temp); // Morning: 6 AM - 12 PM
+          else if (hour >= 12 && hour < 18) acc.afternoon.push(temp); // Afternoon: 12 PM - 6 PM
+          else if (hour >= 18 && hour < 24) acc.evening.push(temp); // Evening: 6 PM - 12 AM
+          else acc.night.push(temp); // Night: 12 AM - 6 AM
+          return acc;
+        }, { morning: [], afternoon: [], evening: [], night: [] });
 
-      const tempLabels = ['Morning', 'Afternoon', 'Evening', 'Night'];
-      const temperatures = [
-        Math.round(tempData.morning.reduce((a, b) => a + b, 0) / tempData.morning.length || 0),
-        Math.round(tempData.afternoon.reduce((a, b) => a + b, 0) / tempData.afternoon.length || 0),
-        Math.round(tempData.evening.reduce((a, b) => a + b, 0) / tempData.evening.length || 0),
-        Math.round(tempData.night.reduce((a, b) => a + b, 0) / tempData.night.length || 0)
-      ];
+        const tempLabels = ['Morning', 'Afternoon', 'Evening', 'Night'];
+        const temperatures = [
+          Math.round(tempData.morning.reduce((a, b) => a + b, 0) / tempData.morning.length || 0),
+          Math.round(tempData.afternoon.reduce((a, b) => a + b, 0) / tempData.afternoon.length || 0),
+          Math.round(tempData.evening.reduce((a, b) => a + b, 0) / tempData.evening.length || 0),
+          Math.round(tempData.night.reduce((a, b) => a + b, 0) / tempData.night.length || 0)
+        ];
 
-      // Initialize the temperature chart
-      initializeTempChart(tempLabels, temperatures);
+        // Initialize the temperature chart
+        initializeTempChart(tempLabels, temperatures);
 
 
+        // After all data is loaded and displayed
+        // Force a reflow to ensure animation triggers
+        void dashboard.offsetWidth;
+        dashboard.classList.add('loaded');
+        
     } catch (error) {
       console.error('Error updating weather:', error);
       alert('Could not fetch weather data. Please try again.');
